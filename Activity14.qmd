@@ -1,0 +1,123 @@
+---
+title: "Activity14.qmd"
+author: "Akseli Karsikas"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+format: 
+  pdf:
+    toc: false
+    number-sections: true
+    geometry: margin=1in
+    fig-cap-location: top
+    tbl-cap-location: top
+execute:
+  echo: false
+  warning: false
+  message: false
+  
+editor: visual
+---
+
+## Armed Forces Data Wrangling Redux
+
+In this section, I revisited the Armed Forces dataset used in earlier assignments to demonstrate improved data wrangling and reproducibility. The goal was to create a clean dataset that focuses on Army enlisted members, exploring the relationship between sex and rank group.
+
+**Table 1.** Frequency table of sex and rank among Army enlisted soldiers.
+
+```{r}
+library(tidyverse)
+
+set.seed(184)
+ranks <- c("Private", "Corporal", "Sergeant", "Staff Sergeant", "Sergeant Major")
+sex <- c("Male", "Female")
+
+army_enlisted <- expand.grid(rank = ranks, sex = sex) |>
+  mutate(count = sample(100:500, 10, replace = TRUE))
+
+army_table <- army_enlisted |>
+  pivot_wider(names_from = rank, values_from = count)
+
+knitr::kable(army_table)
+```
+
+## Popularity of Baby Names
+
+For this visualization, I used the babynames dataset to explore how name popularity changes across generations. Ashley shows a major spike in popularity in the late 20th century before declining, while Akseli doesn't show up at all and Oskar remains rare but show really modest increases in recent years. I chose these names beacuse they are names of either people I know or mine.
+
+**Figure 1.** Trends in popularity for selected baby names (1880–2020).
+
+```{r}
+library(babynames)
+library(ggplot2)
+
+selected_names <- babynames |>
+  filter(name %in% c("Akseli", "Oskar", "Ashley"))
+
+ggplot(data = selected_names, aes(x = year, y = prop, color = name, linetype = sex)) +
+  geom_line(linewidth = 1) +
+  labs(
+    x = "Year",
+    y = "Proportion of Births",
+    title = "Popularity of Selected Baby Names (1880–2020)"
+  ) +
+  theme_minimal() +
+  scale_color_brewer(palette = "Dark2")
+```
+
+## Plotting a Mathematical Function
+
+I considered a rectangular sheet of paper measuring 36 inches by 48 inches instead of a square piece. The goal is to determine how the volume of the open-top box changes as the size of the corner cutouts increases. The box volume function is defined as $V(x) = x(48 - 2x)(36 - 2x)$. , the resulting plot shows how the box volume grows with larger cutouts until reaching an optimal value, then declines as the cutouts remove too much material.\
+
+**Figure 2.** Volume of the box as a function of cutout size for a 36×48 inch sheet.\
+
+```{r}
+library(ggplot2)
+
+# Define the volume function for a 36×48 inch sheet
+volume <- function(x) (48 - 2*x) * (36 - 2*x) * x
+
+# Plot the function using ggplot2 and stat_function
+ggplot(data.frame(x = c(0, 18)), aes(x)) +
+  stat_function(fun = volume, linewidth = 1.2, color = "steelblue") +
+  labs(
+    x = "Cutout Size (inches)",
+    y = "Volume (cubic inches)",
+    title = "Box Volume vs. Cutout Size for a 36×48 inch Sheet"
+  ) +
+  theme_minimal()
+```
+
+## What I Feel I've Learnt So Far
+
+This course has helped me connect data wrangling, visualization, and modeling in one workflow. I’ve learned to use Quarto for reproducibility and documentation, tidyverse for data cleaning, and ggplot2 for communicating results clearly.\
+
+\`\`\`{# Code Appendix}
+
+#Armed Froces Data Wrangling Section #Cleaning and summarizing the subset of Armed forces data
+
+library(tidyverse) #loading tidyverse for the wrangling
+
+set.seed(184) #set seed for so it's reproductible using the mock data. #I couldn't figure out how to make sure that the URL link to the dataset #would have been 100% reproductible for everyone and in every situation ranks \<- c("Private", "Corporal", "Sergeant", "Staff Sergeant", "Sergeant Major") #Army ranks list sex \<- c("Male", "Female") #list of sexes
+
+army_enlisted \<- expand.grid(rank = ranks, sex = sex) \|\> mutate(count = sample(100:500, 10, replace = TRUE)) #all possible rank and sex combos and the random soldier counts
+
+army_table \<- army_enlisted \|\> pivot_wider(names_from = rank, values_from = count) #making the table into a wide one
+
+army_table #showing the frequency table
+
+#Section Baby Names Visualization #time serie plot for baby names popularity over time
+
+library(babynames)#load the babynames dataset library(ggplot2)#load ggplot2 for plotting
+
+#filter the dataset for Akseli, Oskar, Ashley #includes both male and female selected_names \<- babynames \|\> filter(name %in% c("Akseli", "Oskar", "Ashley")) #select names to compare
+
+#creating a time series line plot showing the proportion of births per year ggplot(data = selected_names, aes(x = year, y = prop, color = name, linetype = sex)) + geom_line(linewidth = 1) + #use line thickness of 1 labs( x = "Year", #labeling x-axis y = "Proportion of Births", #labeling y-axis title = "Popularity Trends for Selected Baby Names (1880–2020)" , alt = "Line chart showing name popularity for Ashley, Oskar, and Akseli by year and sex." )+ theme_minimal() + #simple clean theme
+
+#Section Box Problem Visualization #Plot the volume of an open-top box as a function of cutout size
+
+library(ggplot2)
+
+#the volume function for a 36×48 inch sheet volume \<- function(x) (48 - 2*x)* (36 - 2*x)* x
+
+#plottting the function using ggplot2 and stat_function ggplot(data.frame(x = c(0, 18)), aes(x)) + stat_function(fun = volume, linewidth = 1.2, color = "steelblue") + labs( x = "Cutout Size (inches)", y = "Volume (cubic inches)", title = "Box Volume vs. Cutout Size for a 36×48 inch Sheet" ) + theme_minimal() #setting up the plot range from 0 to 18, plotting the volume curve, labeling axes and title, adding the minimal theme here too
+
+\`\`\`
